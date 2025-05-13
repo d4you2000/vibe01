@@ -9,7 +9,11 @@ st.header("5학년 학생 명단 입력")
 uploaded_file = st.file_uploader("학생 명단 CSV 파일을 업로드하세요 (이름, 성별)")
 
 if uploaded_file is not None:
-    students_df = pd.read_csv(uploaded_file)
+    try:
+        students_df = pd.read_csv(uploaded_file, encoding='utf-8')
+    except UnicodeDecodeError:
+        students_df = pd.read_csv(uploaded_file, encoding='euc-kr')
+
     st.write("업로드된 학생 명단:")
     st.dataframe(students_df)
 
