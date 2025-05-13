@@ -10,8 +10,8 @@ uploaded_file = st.file_uploader("엑셀 파일 업로드", type=["xlsx", "xls"]
 
 if uploaded_file is not None:
     try:
-        import openpyxl
-        df = pd.read_excel(uploaded_file, engine='openpyxl')
+        # openpyxl을 설치하지 않고도 기본 엔진으로 처리할 수 있도록 수정
+        df = pd.read_excel(uploaded_file)
 
         if "이름" in df.columns and "성별" in df.columns:
             st.write("5학년 학생 명단:")
@@ -42,5 +42,5 @@ if uploaded_file is not None:
                     st.write(pd.DataFrame(students, columns=["이름", "성별"]))
         else:
             st.error("엑셀 파일에 '이름'과 '성별' 열이 필요합니다.")
-    except ImportError:
-        st.error("필요한 패키지 'openpyxl'이 설치되지 않았습니다. 'pip install openpyxl'을 통해 설치하세요.")
+    except Exception as e:
+        st.error(f"엑셀 파일을 읽는 중 오류가 발생했습니다: {str(e)}")
