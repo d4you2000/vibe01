@@ -2,47 +2,50 @@ import streamlit as st
 import pandas as pd
 import random
 
-st.title("초등학교 6학년 반편성 웹앱")
+st.title("6학년 반편성 웹앱")
+st.write("5학년 학생 명단을 입력하고 성별 비율을 유지하여 6학년 반편성을 자동으로 수행합니다.")
 
-# 학생 명단 입력
-st.header("5학년 학생 명단 입력")
-uploaded_file = st.file_uploader("학생 명단 CSV 파일을 업로드하세요 (이름, 성별)")
+# 학생 데이터 입력
+st.subheader("5학년 학생 명단 입력")
+num_classes = st.number_input("5학년 학급 수", min_value=1, value=7)
+class_data = {}
 
-if uploaded_file is not None:
-    try:
-        students_df = pd.read_csv(uploaded_file, encoding='utf-8')
-    except UnicodeDecodeError:
-        students_df = pd.read_csv(uploaded_file, encoding='euc-kr')
+for i in range(num_classes):
+    class_name = f"5학년 {i+1}반"
+    st.subheader(class_name)
+    names = st.text_area(f"{class_name} 학생 이름 (줄바꿈으로 구분)")
+    genders = st.text_area(f"{class_name} 학생 성별 (줄바꿈으로 구분, M 또는 F)")
 
-    st.write("업로드된 학생 명단:")
-    st.dataframe(students_df)
+    name_list = names.splitlines()
+    gender_list = genders.splitlines()
 
-    # 사용자에게 열 이름 입력받기
-    name_column = st.text_input("학생 이름 열 이름", value="이름")
-    gender_column = st.text_input("성별 열 이름", value="성별")
+    if len(name_list) == len(gender_list):
+        class_data[class_name] = pd.DataFrame({"이름": name_list, "성별": gender_list})
+    else:
+        st.error(f"{class_name} 이름과 성별 수가 일치하지 않습니다.")
 
-    # 성별 비율 확인
-    male_students = students_df[students_df[gender_column] == '남']
-    female_students = students_df[students_df[gender_column] == '여']
+# 반편성 실행
+if st.button("6학년 반편성 실행"):
+    all_students = pd.concat(class_data.values(), ignore_index=True)
 
-    st.write(f"남학생: {len(male_students)}명, 여학생: {len(female_students)}명")
+    males = all_students[all_students["성별"] == "M"].sample(frac=1).reset_index(drop=True)
+    females = all_students[all_students["성별"] == "F"].sample(frac=1).reset_index(drop=True)
 
-    # 반 수 입력
-    num_classes = st.number_input("6학년 반 수 입력", min_value=1, max_value=10, value=6)
+    num_6th_classes = num_classes
+    class_size = len(all_students) // num_6th_classes
 
-    if st.button("반편성 실행"):
-        random.shuffle(male_students.values.tolist())
-        random.shuffle(female_students.values.tolist())
+    assigned_classes = {f"6학년 {i+1}반": [] for i in range(num_6th_classes)}
 
-        # 반편성 로직
-        class_lists = [[] for _ in range(num_classes)]
+    for i in range(class_size):
+        for class_name in assigned_classes.keys():
+            if len(males) > 0:
+                assigned_classes[class_name].append(males.iloc[0].tolist())
+                males = males.iloc[1:]
+            if len(females) > 0:
+                assigned_classes[class_name].append(females.iloc[0].tolist())
+                females = females.iloc[1:]
 
-        for i, student in enumerate(male_students.values.tolist() + female_students.values.tolist()):
-            class_lists[i % num_classes].append(student)
-
-        # 결과 출력
-        st.header("6학년 반편성 결과")
-        for i, class_list in enumerate(class_lists, start=1):
-            st.subheader(f"6-{i}반")
-            class_df = pd.DataFrame(class_list, columns=[name_column, gender_column])
-            st.dataframe(class_df)
+    st.subheader("6학년 반편성 결과")
+    for class_name, students in assigned_classes.items():
+        st.write(f"### {class_name}")
+        st.write(pd.DataFrame(students, columns=["이름", "성별"]))
