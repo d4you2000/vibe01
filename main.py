@@ -13,9 +13,13 @@ if uploaded_file is not None:
     st.write("업로드된 학생 명단:")
     st.dataframe(students_df)
 
+    # 사용자에게 열 이름 입력받기
+    name_column = st.text_input("학생 이름 열 이름", value="이름")
+    gender_column = st.text_input("성별 열 이름", value="성별")
+
     # 성별 비율 확인
-    male_students = students_df[students_df['성별'] == '남']
-    female_students = students_df[students_df['성별'] == '여']
+    male_students = students_df[students_df[gender_column] == '남']
+    female_students = students_df[students_df[gender_column] == '여']
 
     st.write(f"남학생: {len(male_students)}명, 여학생: {len(female_students)}명")
 
@@ -36,5 +40,5 @@ if uploaded_file is not None:
         st.header("6학년 반편성 결과")
         for i, class_list in enumerate(class_lists, start=1):
             st.subheader(f"6-{i}반")
-            class_df = pd.DataFrame(class_list, columns=["이름", "성별"])
+            class_df = pd.DataFrame(class_list, columns=[name_column, gender_column])
             st.dataframe(class_df)
