@@ -11,10 +11,10 @@ selected_chord = st.selectbox('🎸 코드 선택:', chords)
 
 # 코드 다이어그램 표시
 chord_images = {
-    'C': 'https://upload.wikimedia.org/wikipedia/commons/4/4d/C_Ukulele_Chord.png',
-    'G7': 'https://upload.wikimedia.org/wikipedia/commons/3/3d/G7_Ukulele_Chord.png',
-    'Am': 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Am_Ukulele_Chord.png',
-    'F': 'https://upload.wikimedia.org/wikipedia/commons/6/64/F_Ukulele_Chord.png',
+    'C': 'https://ukutabs.com/wp-content/uploads/2020/11/C_Ukulele_Chord.png',
+    'G7': 'https://ukutabs.com/wp-content/uploads/2020/11/G7_Ukulele_Chord.png',
+    'Am': 'https://ukutabs.com/wp-content/uploads/2020/11/Am_Ukulele_Chord.png',
+    'F': 'https://ukutabs.com/wp-content/uploads/2020/11/F_Ukulele_Chord.png',
 }
 
 if selected_chord in chord_images:
